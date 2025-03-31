@@ -1,0 +1,7 @@
+How to save my work in GitHub
+
+1. Return to the command/terminal window and run the following commands
+    1. git add .
+    2. git commit -m “Adding new file”
+    3. git push origin main
+2. If you check on your Github page, you should see the main.py file is now there as well
