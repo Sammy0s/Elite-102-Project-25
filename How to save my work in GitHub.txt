@@ -1,5 +1,7 @@
 How to save my work in GitHub
 
+(Don't judge, I'm new to this :sob:)
+
 1. Return to the command/terminal window and run the following commands
     1. git add .
     2. git commit -m “Adding new file”
