@@ -2,21 +2,35 @@ from tkinter import *
 
 root = Tk()
 root.title("Elite 102 Project")
+user_last_name = "not_set"
+user_password = "not_set"
 
-def enterName():
-    greating = "Welcome, " + e.get() + "!"
-    welcome_label = Label(root, text=greating)
-    welcome_label.pack()
+def set_login_credits(ulname, upass):
+    user_last_name = ulname
+    user_password = upass
 
-welcomeLabel = Label(root, text="Welcome to my project!", padx=20, pady=5)
-e = Entry(root)
-submitButton = Button(root, text="Submit", command=enterName)
+def login_screen():
 
+    welcomeLabel = Label(root, text="Welcome to my project!", padx=20, pady=5)
+    loginDirectionsLabel = Label(root, text="Please enter your last name and account password.")
+    u_lname = Entry(root)
+    u_pass = Entry(root)
 
-welcomeLabel.pack()
-e.pack()
-submitButton.pack()
+    lnameLabel = Label(root, text=user_last_name, padx=20, pady=5)
+    lpassLabel = Label(root, text=user_password, padx=20, pady=5)
 
-e.insert(0, "Enter Your Name")
+    submitButton = Button(root, text="Login", command=set_login_credits(u_lname.get(), u_pass.get()))
+    if (user_last_name != "not_set" and user_password != "not_set"):
+        return (user_last_name, user_password)
 
-root.mainloop()
+    welcomeLabel.pack()
+    u_lname.pack()
+    u_pass.pack()
+    submitButton.pack()
+    lnameLabel.pack()
+    lpassLabel.pack()
+
+    u_lname.insert(0, "Last Name")
+    u_pass.insert(0, "Password")
+    root.mainloop()
+
