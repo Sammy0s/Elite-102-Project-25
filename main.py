@@ -49,13 +49,6 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
-test = "owner = 'Josh'"
-
-# mycursor.execute("")
-
-# for x in mycursor:
-#     print(x)
-
 def login_attempt(last_name, u_pass):
     set_login_credits(last_name, u_pass)
     login_credits = (last_name, u_pass)
@@ -66,10 +59,5 @@ def login_attempt(last_name, u_pass):
     for x in mycursor:
         print(x)
         
-
-def start():
-    login_screen()
-
-start()
 
 # login_attempt('smiths','abc123')
