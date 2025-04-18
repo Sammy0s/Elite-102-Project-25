@@ -1,4 +1,3 @@
-import mysql.connector
 import tkinter as tk
 
 # For the template on how to use different pages with buttons using the pace and lift functions
@@ -115,73 +114,4 @@ if __name__ == "__main__":
 
     root.mainloop()
     # Anything past this point only happens after the program is terminated. Good to know.
-
-
-
-
-
-
-
-#### ~~~~~~~~~~~~SQL Backend stuff~~~~~~~~~~~~~~~~
-
-# Making connection to SQL Database
-mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="MldmAMT10/13",
-    database="mydatabase"
-)
-
-mycursor = mydb.cursor()
-
-# functions for utility ?
-
-
-# TODO call whenever submit button is pressed
-# prints info on user where u_lname is last name and u_pass is user password
-def select_user(u_lname, u_pass):
-    cmd = "SELECT * FROM accounts WHERE namelast = %s AND password = %s"
-    vals = (u_lname, u_pass)
-    mycursor.execute(cmd, vals)
-
-    accs_found = 0
-    for x in mycursor:
-        accs_found = accs_found + 1
-        print("Found User: ")
-        print(x) # x is a touple that represents the user (prints whole touple)
-
-        # the 3rd element of the touple x is the first name
-        # the 2nd element of the touple x is the last name
-        print("User's Name = " + x[2] + " " + x[1])
-    print(str(accs_found) + " account(s) found.")
-
-    # Okay- at this point I want to give some type of response
-        # if accs_found != 1: Error try again
-        # else: Switch to a welcome screen for user
-            # Welcome, u_name!
-            # *display bank account details*
-
-
-
-
     
-
-
-
-
-# TESTING
-
-
-#~~~~~
-# testing connection to MySQL
-
-# mycursor.execute("SELECT * from accounts")
-# for x in mycursor:
-#     print(x)
-#~~~~~
-
-
-#~~~~~
-# testing function that prints user account info
-# select_user("smith", "abc123")
-#~~~~~
