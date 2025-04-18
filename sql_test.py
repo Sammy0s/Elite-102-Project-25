@@ -68,6 +68,7 @@ def display_p3():
     p3.show()
 
 
+# ~~~~~~~~~~~~~~~~~~~~
 
 class MainView(tk.Frame):
     def __init__(self, *args, **kwargs):
@@ -78,6 +79,8 @@ class MainView(tk.Frame):
 
         global p2
         p2 = Page2(self)
+
+        global p3
         p3 = Page3(self)
 
         print("Set GPages")
@@ -154,7 +157,27 @@ def select_user(u_lname, u_pass):
 
 
 
+class user():
+    u_id = -1
+    u_lastname = "not set"
+    u_password = "not set"
+    u_balance = -1
+    u_email = "not set"
 
+    def __init__(self, u_tuple):
+        self.u_id = u_tuple[0]
+        self.u_lastname = u_tuple[1]
+        self.u_password = u_tuple[2]
+        self.u_balance = u_tuple[3]
+        self.u_email = u_tuple[4]
+    
+
+    
+    def __str__(self):
+        return f"User: lastname: {self.u_lastname}, acc id: {self.u_id}"
+
+
+    
     
 
 
