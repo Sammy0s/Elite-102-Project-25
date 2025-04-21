@@ -19,6 +19,14 @@ class user():
         self.u_balance = u_tuple[4]
         self.u_email = u_tuple[5]
     
+    def new_assign(self, u_tuple):
+        self.u_id = u_tuple[0]
+        self.u_lastname = u_tuple[1]
+        self.u_firstname = u_tuple[2]
+        self.u_password = u_tuple[3]
+        self.u_balance = u_tuple[4]
+        self.u_email = u_tuple[5]
+    
     def __str__(self):
         return f"User: lastname: {self.u_lastname}, acc id: {self.u_id}"
 
@@ -79,14 +87,18 @@ def select_user(u_lname, u_pass):
 
     if (accs_found > 1):
         print("Error- Multiple accounts found. Duplicate accounts?")
-        return False
+        return None
     elif (accs_found == 1):
-        global cur_user
-        cur_user = user(u_tuple)
-        print(cur_user)
-        print("test cur_user: " + str(test_user_object(cur_user, 6)))
-        return cur_user
-    return False
+        worldwide.cur_user.new_assign(u_tuple)
+        
+
+        print(worldwide.cur_user)
+        print("test cur_user: " + str(test_user_object(worldwide.cur_user, 6)))
+        print("Welcome, " + worldwide.cur_user.u_firstname + "!!")
+        return worldwide.cur_user
+    elif (accs_found == 0):
+        return None
+    return None
 
 
     # Okay- at this point I want to give some type of response
@@ -97,7 +109,16 @@ def select_user(u_lname, u_pass):
 
 
 # Globals ??
-cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
+
+
+class worldwide():
+    cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
+
+    def set_cur_user(new_user):
+        global cur_user
+        cur_user = new_user
+
+
 p_login = "not set"
 p_dash = "not set"
 p3 = "not set"  
@@ -114,7 +135,7 @@ def display_p3():
 
 
 
-print("test cur_user: " + str(test_user_object(cur_user, 6)))
+print("test cur_user: " + str(test_user_object(worldwide.cur_user, 6)))
 
 
 
@@ -156,10 +177,19 @@ class Login(Page):
 
 class u_dashboard(Page):
    def __init__(self, *args, **kwargs):
+       
+       print(worldwide.cur_user)
+       t_cur_user = worldwide.cur_user
+
+       print("Set name to: " + worldwide.cur_user.u_firstname)
+
+       print("Set balance to: " + str(worldwide.cur_user.u_balance))
+       
+
        Page.__init__(self, *args, **kwargs)
        label = tk.Label(self, text="This is the user dashboard")
-       wel = tk.Label(self, text=f"Welcome back, {cur_user.u_firstname}!!")
-       dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {cur_user.u_balance}.")
+       wel = tk.Label(self, text=f"Welcome back, {worldwide.cur_user.u_firstname}!!")
+       dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {worldwide.cur_user.u_balance}.")
        # dis_rec_trans = tk.Label(self, text=f"Your most recent transaction: \n {cur_user.get_rec_trans()}") TODO most recent transactions require transactions database
        button_deposit = tk.Button(self, text="Deposit Money", command = lambda: print("Deposit Money Button Pressed"))
        button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: print("Withdrawl Money Button Pressed"))
@@ -188,6 +218,7 @@ def attempt_login(nm, pword):
     print(f"Last name: {nm}, Password: {pword}")
     if (select_user(nm, pword) != None):
         #TODO set cur_user to user that just logged in
+        worldwide.cur_user = select_user(nm, pword) 
 
         p_dash.show()
     
@@ -250,7 +281,7 @@ class TestUserClass(unittest.TestCase):
 #     unittest.main()
      
 
-print("TestUserObj Test Success?: " + str(test_user_object(cur_user, 6)))
+print("TestUserObj Test Success?: " + str(test_user_object(worldwide.cur_user, 6)))
 #~~~~~
 # testing connection to MySQL
 
