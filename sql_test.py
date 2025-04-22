@@ -96,10 +96,6 @@ def select_user(u_lname, u_pass):
         print("test cur_user: " + str(test_user_object(cur_user, 6)))
         print("Welcome, " + cur_user.u_firstname + "!!")
 
-        global wel
-        wel.config(text = f"Welcome back, {cur_user.u_firstname}!!")
-        global dis_balance
-        dis_balance.config(text=f"Your current balance is: {cur_user.u_balance}.")
 
         return cur_user
     elif (accs_found == 0):
@@ -116,8 +112,8 @@ def display_p_login():
 def display_u_dashboard():
     p_dash.show()
 
-def display_p3():
-    p3.show()
+def display_p_log_conf():
+    p_log_conf.show()
 
 
 
@@ -142,7 +138,10 @@ class Login(Page):
         # building login screen
         welcomeLabel = tk.Label(self, text="Welcome to my project!", padx=20)
         loginDirectionsLabel = tk.Label(self, pady=10, text="Please enter your last name and account password.")
+        
+        global u_lname
         u_lname = tk.Entry(self)
+        global u_pass
         u_pass = tk.Entry(self)
 
         submitButton = tk.Button(self, text="Login", command = lambda: attempt_login(u_lname.get(), u_pass.get()))
@@ -154,21 +153,12 @@ class Login(Page):
         submitButton.pack()
         login_label.pack(side="top", fill="both", expand=True)
 
+        
         u_lname.insert(0, "Last Name")
         u_pass.insert(0, "Password")
 
 class u_dashboard(Page):
    def __init__(self, *args, **kwargs):
-       global cur_user
-       print(cur_user)
-       
-       t_cur_user = cur_user
-
-       print("Set name to: " + cur_user.u_firstname)
-
-       print("Set balance to: " + str(cur_user.u_balance))
-       
-
        Page.__init__(self, *args, **kwargs)
        label = tk.Label(self, text="This is the user dashboard")
        global wel
@@ -177,9 +167,10 @@ class u_dashboard(Page):
        dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {cur_user.u_balance}.")
        # dis_rec_trans = tk.Label(self, text=f"Your most recent transaction: \n {cur_user.get_rec_trans()}") TODO most recent transactions require transactions database
        button_deposit = tk.Button(self, text="Deposit Money", command = lambda: print("Deposit Money Button Pressed"))
-       button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: print("Withdrawl Money Button Pressed"))
+       global p_with
+       button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: p_with.show())
 
-       button_logout = tk.Button(self, text="Logout to sign in screen", command = lambda: print("Logout Button Pressed"))
+       button_logout = tk.Button(self, text="Logout to sign in screen", command = lambda: attempt_logout(False))
 
 
        wel.pack()
@@ -192,21 +183,100 @@ class u_dashboard(Page):
 
        label.pack(side="top", fill="both", expand=True)
 
-class Page3(Page):
+class logout_confrim(Page):
    def __init__(self, *args, **kwargs):
        Page.__init__(self, *args, **kwargs)
-       label = tk.Label(self, text="This is page 3")
+       label = tk.Label(self, text="This is the logout confrimation screen")
+       log_out_label = tk.Label(self, text="Are you sure you want to logout?")
+       button_logout = tk.Button(self, text="Logout", command = lambda: attempt_logout(True))
+       button_to_dash = tk.Button(self, text="Back to Dashboard", command = lambda: p_dash.show())
+
+       log_out_label.pack()
+       button_logout.pack()
+       button_to_dash.pack()
        label.pack(side="top", fill="both", expand=True)
 
+class withdraw(Page):
+   def __init__(self, *args, **kwargs):
+       Page.__init__(self, *args, **kwargs)
+       label = tk.Label(self, text="This is the withdraw page")
+       withdraw_label = tk.Label(self, text="How much would you like to withdraw?")
+       #TODO I need an entry box to get the ammount the user wants to withdraw: entry
+       global u_with_amm
+       u_with_amm = tk.Entry(self)
+       button_submit = tk.Button(self, text="submit", command = lambda: attempt_withdraw(u_with_amm.get()))
+       button_to_dash = tk.Button(self, text="Cancel", command = lambda: p_dash.show())
+
+       withdraw_label.pack()
+       u_with_amm.pack()
+       button_submit.pack()
+       button_to_dash.pack()
+       label.pack(side="top", fill="both", expand=True)
+
+class withdraw_confrim(Page):
+   def __init__(self, *args, **kwargs):
+       Page.__init__(self, *args, **kwargs)
+       global with_conf
+       with_conf = tk.Label(self, text="This is the withdraw confrimation screen.")
+       log_out_label = tk.Label(self, text="Withdraw confrimation")
+       button_to_dash = tk.Button(self, text="Back to Dashboard", command = lambda: p_dash.show())
+
+       log_out_label.pack()
+       button_to_dash.pack()
+       with_conf.pack(side="top", fill="both", expand=True)
+
+def update_gui():
+    global wel
+    wel.config(text = f"Welcome back, {cur_user.u_firstname}!!")
+    global dis_balance
+    dis_balance.config(text=f"Your current balance is: {cur_user.u_balance}.")
+
+    global u_lname
+    txt = u_lname.get()
+    u_lname.delete(0, len(txt))
+    u_lname.insert(0, "Last Name")
+    global u_pass
+    txt = u_pass.get()
+    u_pass.delete(0, len(txt))
+    u_pass.insert(0, "Password")
+
+    global with_conf
+    with_conf.config(text=f"Hm. Something went wrong.")
+
+def attempt_logout(confrimed):
+    if (confrimed == False):
+        p_log_conf.show()
+    else:
+        update_gui()
+        p_login.show()
+
 def attempt_login(nm, pword):
-    print("yay.")
-    print(f"Last name: {nm}, Password: {pword}")
+    # print("yay.")
+    # print(f"Last name: {nm}, Password: {pword}")
     if (select_user(nm, pword) != None):
         #TODO set cur_user to user that just logged in
         global cur_user
         cur_user = select_user(nm, pword)
+        update_gui()
 
         p_dash.show()
+
+def attempt_withdraw(ammount):
+    # TODO needs to validate user input and then if it's okay it needs to withdraw funds from user account
+    # Returns error/success message to be displayed on confrimation screen.
+    try:
+        w_ammount = int(ammount)
+    except:
+        with_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
+        p_with_con.show()
+    if (cur_user.u_balance < w_ammount):
+        with_conf.config(text=f"Error: Insufficient funds")
+        p_with_con.show()
+    if (cur_user.u_balance > w_ammount):
+        # TODO I need to make methods that will edit the database instead of just the user object
+        # cur_user.u_balance = cur_user.u_balance-w_ammount
+        with_conf.config(text=f"Successfully withdrew {w_ammount} from your account! (Nothing actually withdrew yet.)")
+        p_with_con.show()
     
 
 # ~~~~~~~~~~~~~~~~~~~~
@@ -214,9 +284,6 @@ def attempt_login(nm, pword):
 class MainView(tk.Frame):
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs) # call to parent class
-        
-        global the_user_object_plz_work
-        print(the_user_object_plz_work)
 
         global p_login
         p_login = Login(self)
@@ -224,8 +291,14 @@ class MainView(tk.Frame):
         global p_dash
         p_dash = u_dashboard(self)
 
-        global p3
-        p3 = Page3(self)
+        global p_log_conf
+        p_log_conf = logout_confrim(self)
+
+        global p_with
+        p_with = withdraw(self)
+
+        global p_with_con
+        p_with_con = withdraw_confrim(self)
 
         print("Set GPages")
 
@@ -236,11 +309,13 @@ class MainView(tk.Frame):
 
         p_login.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_dash.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
-        p3.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_log_conf.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_with.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_with_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         p_login.show() # shows p1 by deafult
         # p2.show()
-        # p3.show()
+        # p_log_conf.show()
 # end of graphics section
 
 
@@ -301,8 +376,6 @@ class TestUserClass(unittest.TestCase):
 
 if __name__ == "__main__":
     cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
-    the_user_object_plz_work = "ah yes this is working"
-
 
     root = tk.Tk()
     root.title("Sam's Bank of Elite 102 (trademarked)")
