@@ -89,39 +89,26 @@ def select_user(u_lname, u_pass):
         print("Error- Multiple accounts found. Duplicate accounts?")
         return None
     elif (accs_found == 1):
-        worldwide.cur_user.new_assign(u_tuple)
+        global cur_user
+        cur_user.new_assign(u_tuple)
         
+        print(cur_user)
+        print("test cur_user: " + str(test_user_object(cur_user, 6)))
+        print("Welcome, " + cur_user.u_firstname + "!!")
 
-        print(worldwide.cur_user)
-        print("test cur_user: " + str(test_user_object(worldwide.cur_user, 6)))
-        print("Welcome, " + worldwide.cur_user.u_firstname + "!!")
-        return worldwide.cur_user
+        global wel
+        wel.config(text = f"Welcome back, {cur_user.u_firstname}!!")
+        global dis_balance
+        dis_balance.config(text=f"Your current balance is: {cur_user.u_balance}.")
+
+        return cur_user
     elif (accs_found == 0):
         return None
     return None
 
 
-    # Okay- at this point I want to give some type of response
-        # if accs_found != 1: Error try again
-        # else: Switch to a welcome screen for user
-            # Welcome, u_name!
-            # *display bank account details*
-
 
 # Globals ??
-
-
-class worldwide():
-    cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
-
-    def set_cur_user(new_user):
-        global cur_user
-        cur_user = new_user
-
-
-p_login = "not set"
-p_dash = "not set"
-p3 = "not set"  
 
 def display_p_login():
     p_login.show()
@@ -131,11 +118,6 @@ def display_u_dashboard():
 
 def display_p3():
     p3.show()
-
-
-
-
-print("test cur_user: " + str(test_user_object(worldwide.cur_user, 6)))
 
 
 
@@ -177,19 +159,22 @@ class Login(Page):
 
 class u_dashboard(Page):
    def __init__(self, *args, **kwargs):
+       global cur_user
+       print(cur_user)
        
-       print(worldwide.cur_user)
-       t_cur_user = worldwide.cur_user
+       t_cur_user = cur_user
 
-       print("Set name to: " + worldwide.cur_user.u_firstname)
+       print("Set name to: " + cur_user.u_firstname)
 
-       print("Set balance to: " + str(worldwide.cur_user.u_balance))
+       print("Set balance to: " + str(cur_user.u_balance))
        
 
        Page.__init__(self, *args, **kwargs)
        label = tk.Label(self, text="This is the user dashboard")
-       wel = tk.Label(self, text=f"Welcome back, {worldwide.cur_user.u_firstname}!!")
-       dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {worldwide.cur_user.u_balance}.")
+       global wel
+       wel = tk.Label(self, text=f"Welcome back, {cur_user.u_firstname}!!")
+       global dis_balance
+       dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {cur_user.u_balance}.")
        # dis_rec_trans = tk.Label(self, text=f"Your most recent transaction: \n {cur_user.get_rec_trans()}") TODO most recent transactions require transactions database
        button_deposit = tk.Button(self, text="Deposit Money", command = lambda: print("Deposit Money Button Pressed"))
        button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: print("Withdrawl Money Button Pressed"))
@@ -218,7 +203,8 @@ def attempt_login(nm, pword):
     print(f"Last name: {nm}, Password: {pword}")
     if (select_user(nm, pword) != None):
         #TODO set cur_user to user that just logged in
-        worldwide.cur_user = select_user(nm, pword) 
+        global cur_user
+        cur_user = select_user(nm, pword)
 
         p_dash.show()
     
@@ -229,6 +215,9 @@ class MainView(tk.Frame):
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs) # call to parent class
         
+        global the_user_object_plz_work
+        print(the_user_object_plz_work)
+
         global p_login
         p_login = Login(self)
 
@@ -281,7 +270,7 @@ class TestUserClass(unittest.TestCase):
 #     unittest.main()
      
 
-print("TestUserObj Test Success?: " + str(test_user_object(worldwide.cur_user, 6)))
+# print("TestUserObj Test Success?: " + str(test_user_object(worldwide.cur_user, 6)))
 #~~~~~
 # testing connection to MySQL
 
@@ -311,12 +300,15 @@ print("TestUserObj Test Success?: " + str(test_user_object(worldwide.cur_user, 6
 # MAIN LOOP~~~~~
 
 if __name__ == "__main__":
+    cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
+    the_user_object_plz_work = "ah yes this is working"
+
+
     root = tk.Tk()
     root.title("Sam's Bank of Elite 102 (trademarked)")
     main = MainView(root)
     main.pack(side="top", fill="both", expand=True)
     root.wm_geometry("400x400")
-
 
     root.mainloop()
     # Anything past this point only happens after the program is terminated. Good to know.
