@@ -10,8 +10,10 @@ class user():
     u_password = "not set"
     u_balance = -1
     u_email = "not set"
+    u_tuple = ()
 
     def __init__(self, u_tuple):
+        self.u_tuple = u_tuple
         self.u_id = u_tuple[0]
         self.u_lastname = u_tuple[1]
         self.u_firstname = u_tuple[2]
@@ -20,6 +22,7 @@ class user():
         self.u_email = u_tuple[5]
     
     def new_assign(self, u_tuple):
+        self.u_tuple = u_tuple
         self.u_id = u_tuple[0]
         self.u_lastname = u_tuple[1]
         self.u_firstname = u_tuple[2]
@@ -27,8 +30,16 @@ class user():
         self.u_balance = u_tuple[4]
         self.u_email = u_tuple[5]
     
+    def reset(self):
+        u_tuple = get_u_tuple(self.u_id)
+        self.new_assign(u_tuple)
     def get_id(self):
         return self.u_id
+    
+    # withdraws money from an account.
+    def user_withdraw(self, amm):
+        withdraw_from_account(self.u_tuple, amm)
+        self.reset()
     
     def __str__(self):
         return f"User: lastname: {self.u_lastname}, acc id: {self.u_id}"
@@ -68,11 +79,15 @@ mycursor = mydb.cursor()
 
 # the_user is a user object
 # ammount_to_withdraw is a float/double value
-def withdraw_from_account(the_user, ammount_to_withdraw):
-    user_id = the_user.get_id()
+# backend use only. Should only be called through the user class
+def withdraw_from_account(u_id, ammount_to_withdraw):
+    #first I need to find the current balance
+    start_balance = get_u_tuple(u_id)[4] # index 4 is the balance
+    withdraw_ammount = start_balance - ammount_to_withdraw
     cmd = "UPDATE accounts SET balance = %s WHERE id = %s"
-    vals = (ammount_to_withdraw, user_id)
-    mycursor.execute("UPDATE accounts SET balance = 4 WHERE id = 1")
+    vals = (withdraw_ammount, u_id)
+    mycursor.execute(cmd, vals)
+    mydb.commit()
 
     # update the user object with the change in the database
     # user_id = the_user.get_id()
@@ -82,6 +97,29 @@ def withdraw_from_account(the_user, ammount_to_withdraw):
     # for x in mycursor:
     #     print(f"Looking for balance...: {x}")
     
+def get_u_tuple(u_id):
+    mycursor.execute(f"SELECT * FROM accounts WHERE id = {u_id}")
+
+    accs_found = 0
+    u_tuple = ()
+    for x in mycursor:
+        accs_found = accs_found + 1
+        # print("Found User: ")
+        # print(x) # x is a touple that represents the user (prints whole touple)
+
+        # the 3rd element of the touple x is the first name
+        # the 2nd element of the touple x is the last name
+        u_tuple = x
+
+    # print(str(accs_found) + " account(s) found.")
+
+    if (accs_found > 1):
+        raise Exception("Error- Multiple accounts found. Duplicate accounts?")
+    elif(accs_found == 0):
+        raise Exception("Error- No accounts found. Does user id exist?")
+    
+    return u_tuple
+
 
 
 # TODO call whenever submit button is pressed
@@ -394,25 +432,52 @@ for x in mycursor:
 print("testt")
 # user()
 print(f"This is a user account's last name: {aldair.u_lastname}")
+print(f"This is a user account's last name: {aldair.u_tuple}")
+
+# testing the user.reset() command. Should update info in user.u_tuple.
+# cmd = "UPDATE accounts SET balance = %s WHERE id = %s"
+# vals = (101, 6)
+# mycursor.execute(cmd, vals)
+# mydb.commit()
+
+# print("resets")
+
+# aldair.reset()
+# print(f"This is a user account's last name: {aldair.u_lastname}")
+# print(f"This is a user account's last name: {aldair.u_tuple}")
+
 # ~~~~~
 
+#testing how to withdraw from the database. 
+# I learned that commiting is important if you're changing something in the table.
 
+# print("pre: "+str(aldair.u_balance))
+# withdraw_from_account(6, 12)
+
+# mycursor.execute("UPDATE accounts SET balance = 102 WHERE id = 6")
+
+# mydb.commit()
+# print("post: "+str(aldair.u_balance))
+
+
+# backend SQL get u_tuple function
+# prints the 3rd element from the u_tuple that gets returned when the user id is provided.
+# print("Trying to print u_tuple for user id 6: " + str(get_u_tuple(6)[2]))
 #~~``
 
-print(aldair.u_balance)
-withdraw_from_account(aldair, 12)
+
 
 
 # MAIN LOOP~~~~~
 
-if __name__ == "__main__":
-    cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
+# if __name__ == "__main__":
+#     cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
 
-    root = tk.Tk()
-    root.title("Sam's Bank of Elite 102 (trademarked)")
-    main = MainView(root)
-    main.pack(side="top", fill="both", expand=True)
-    root.wm_geometry("400x400")
+#     root = tk.Tk()
+#     root.title("Sam's Bank of Elite 102 (trademarked)")
+#     main = MainView(root)
+#     main.pack(side="top", fill="both", expand=True)
+#     root.wm_geometry("400x400")
 
-    root.mainloop()
-    # Anything past this point only happens after the program is terminated. Good to know.
+#     root.mainloop()
+#     # Anything past this point only happens after the program is terminated. Good to know.
