@@ -236,7 +236,8 @@ class u_dashboard(Page):
        global dis_balance
        dis_balance = tk.Label(self, pady=10, text=f"Your current balance is: {cur_user.u_balance}.")
        # dis_rec_trans = tk.Label(self, text=f"Your most recent transaction: \n {cur_user.get_rec_trans()}") TODO most recent transactions require transactions database
-       button_deposit = tk.Button(self, text="Deposit Money", command = lambda: print("Deposit Money Button Pressed"))
+       global p_dep
+       button_deposit = tk.Button(self, text="Deposit Money", command = lambda: p_dep.show())
        global p_with
        button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: p_with.show())
 
@@ -283,6 +284,23 @@ class withdraw(Page):
        button_to_dash.pack()
        label.pack(side="top", fill="both", expand=True)
 
+class deposit(Page):
+   def __init__(self, *args, **kwargs):
+       Page.__init__(self, *args, **kwargs)
+       label = tk.Label(self, text="This is the deposit page")
+       deposit_label = tk.Label(self, text="How much would you like to deposit?")
+       #TODO I need an entry box to get the ammount the user wants to deposit: entry
+       global u_dep_amm
+       u_dep_amm = tk.Entry(self)
+       button_submit = tk.Button(self, text="submit", command = lambda: attempt_deposit(u_dep_amm.get()))
+       button_to_dash = tk.Button(self, text="Cancel", command = lambda: p_dash.show())
+
+       deposit_label.pack()
+       u_dep_amm.pack()
+       button_submit.pack()
+       button_to_dash.pack()
+       label.pack(side="top", fill="both", expand=True)
+
 class withdraw_confrim(Page):
    def __init__(self, *args, **kwargs):
        Page.__init__(self, *args, **kwargs)
@@ -294,6 +312,18 @@ class withdraw_confrim(Page):
        log_out_label.pack()
        button_to_dash.pack()
        with_conf.pack(side="top", fill="both", expand=True)
+
+class deposit_confrim(Page):
+   def __init__(self, *args, **kwargs):
+       Page.__init__(self, *args, **kwargs)
+       global dep_conf
+       dep_conf = tk.Label(self, text="This is the deposit confrimation screen.")
+       log_out_label = tk.Label(self, text="Deposit confrimation")
+       button_to_dash = tk.Button(self, text="Back to Dashboard", command = lambda: p_dash.show())
+
+       log_out_label.pack()
+       button_to_dash.pack()
+       dep_conf.pack(side="top", fill="both", expand=True)
 
 def update_gui():
     global wel
@@ -312,6 +342,17 @@ def update_gui():
 
     global with_conf
     with_conf.config(text=f"Hm. Something went wrong.")
+
+    global u_with_amm
+    txt = u_with_amm.get()
+    u_with_amm.delete(0, len(txt))
+    
+    global u_dep_amm
+    txt = u_dep_amm.get()
+    u_dep_amm.delete(0, len(txt))
+
+    global dep_conf
+    dep_conf.config(text=f"Hm. Something went wrong.")
 
 
 def attempt_logout(confrimed):
@@ -348,8 +389,22 @@ def attempt_withdraw(ammount):
         # cur_user.u_balance = cur_user.u_balance-w_ammount
         cur_user.user_withdraw(w_ammount)
         update_gui()
-        with_conf.config(text=f"Successfully withdrew {w_ammount} from your account! (Nothing actually withdrew yet.)")
+        with_conf.config(text=f"Successfully withdrew {w_ammount} from your account!")
         p_with_con.show()
+
+def attempt_deposit(ammount):
+    # Returns error/success message to be displayed on confrimation screen.
+    try:
+        d_ammount = int(ammount)
+    except:
+        dep_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
+        p_dep_con.show()
+    
+    # cur_user.u_balance = cur_user.u_balance-w_ammount
+    cur_user.user_deposit(d_ammount)
+    update_gui()
+    dep_conf.config(text=f"Successfully deposited {d_ammount} into your account!")
+    p_dep_con.show()
     
 
 # ~~~~~~~~~~~~~~~~~~~~
@@ -370,8 +425,14 @@ class MainView(tk.Frame):
         global p_with
         p_with = withdraw(self)
 
+        global p_dep
+        p_dep = deposit(self)
+
         global p_with_con
         p_with_con = withdraw_confrim(self)
+
+        global p_dep_con
+        p_dep_con = deposit_confrim(self)
 
         print("Set GPages")
 
@@ -384,7 +445,9 @@ class MainView(tk.Frame):
         p_dash.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_log_conf.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_with.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_dep.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_with_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_dep_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         p_login.show() # shows p1 by deafult
         # p2.show()
