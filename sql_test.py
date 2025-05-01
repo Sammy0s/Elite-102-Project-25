@@ -340,9 +340,6 @@ def update_gui():
     u_pass.delete(0, len(txt))
     u_pass.insert(0, "Password")
 
-    global with_conf
-    with_conf.config(text=f"Hm. Something went wrong.")
-
     global u_with_amm
     txt = u_with_amm.get()
     u_with_amm.delete(0, len(txt))
@@ -350,9 +347,6 @@ def update_gui():
     global u_dep_amm
     txt = u_dep_amm.get()
     u_dep_amm.delete(0, len(txt))
-
-    global dep_conf
-    dep_conf.config(text=f"Hm. Something went wrong.")
 
 
 def attempt_logout(confrimed):
@@ -377,35 +371,51 @@ def attempt_withdraw(ammount):
     # TODO needs to validate user input and then if it's okay it needs to withdraw funds from user account
     # Returns error/success message to be displayed on confrimation screen.
     try:
-        w_ammount = int(ammount)
+        w_ammount = float(ammount)
     except:
         with_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
+        update_gui()
         p_with_con.show()
     else:
         if (cur_user.u_balance < w_ammount):
             with_conf.config(text=f"Error: Insufficient funds")
             p_with_con.show()
-        if (cur_user.u_balance > w_ammount):
+        elif(w_ammount <=0.0):
+            with_conf.config(text=f"Error: Ammount to withdraw must be greater than 0")
+            update_gui()
+            p_with_con.show()
+        elif (cur_user.u_balance > w_ammount):
             # TODO I need to make methods that will edit the database instead of just the user object
             # cur_user.u_balance = cur_user.u_balance-w_ammount
             cur_user.user_withdraw(w_ammount)
             update_gui()
             with_conf.config(text=f"Successfully withdrew {w_ammount} from your account!")
             p_with_con.show()
+        else: 
+            update_gui()
+            with_conf.config(text=f"Hm. Something went wrong. Please try again later.")
+            p_with_con.show()
 
 def attempt_deposit(ammount):
     # Returns error/success message to be displayed on confrimation screen.
     try:
-        d_ammount = int(ammount)
+        d_ammount = float(ammount)
     except:
         dep_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
-        p_dep_con.show()
-    else: 
-        # cur_user.u_balance = cur_user.u_balance-w_ammount
-        cur_user.user_deposit(d_ammount)
         update_gui()
-        dep_conf.config(text=f"Successfully deposited {d_ammount} into your account!")
         p_dep_con.show()
+    else:
+        if(d_ammount > 0):
+            # cur_user.u_balance = cur_user.u_balance-w_ammount
+            cur_user.user_deposit(d_ammount)
+            update_gui()
+            dep_conf.config(text=f"Successfully deposited {d_ammount} into your account!")
+            p_dep_con.show()
+        else:
+            dep_conf.config(text=f"Error: Ammount to withdraw must be greater than 0")
+            update_gui()
+            p_dep_con.show()
+
     
 
 # ~~~~~~~~~~~~~~~~~~~~
