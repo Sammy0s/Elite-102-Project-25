@@ -275,7 +275,7 @@ class withdraw(Page):
        #TODO I need an entry box to get the ammount the user wants to withdraw: entry
        global u_with_amm
        u_with_amm = tk.Entry(self)
-       button_submit = tk.Button(self, text="submit", command = lambda: attempt_withdraw(u_with_amm.get()))
+       button_submit = tk.Button(self, text="Submit", command = lambda: attempt_withdraw(u_with_amm.get()))
        button_to_dash = tk.Button(self, text="Cancel", command = lambda: p_dash.show())
 
        withdraw_label.pack()
@@ -292,7 +292,7 @@ class deposit(Page):
        #TODO I need an entry box to get the ammount the user wants to deposit: entry
        global u_dep_amm
        u_dep_amm = tk.Entry(self)
-       button_submit = tk.Button(self, text="submit", command = lambda: attempt_deposit(u_dep_amm.get()))
+       button_submit = tk.Button(self, text="Submit", command = lambda: attempt_deposit(u_dep_amm.get()))
        button_to_dash = tk.Button(self, text="Cancel", command = lambda: p_dash.show())
 
        deposit_label.pack()
@@ -381,16 +381,17 @@ def attempt_withdraw(ammount):
     except:
         with_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
         p_with_con.show()
-    if (cur_user.u_balance < w_ammount):
-        with_conf.config(text=f"Error: Insufficient funds")
-        p_with_con.show()
-    if (cur_user.u_balance > w_ammount):
-        # TODO I need to make methods that will edit the database instead of just the user object
-        # cur_user.u_balance = cur_user.u_balance-w_ammount
-        cur_user.user_withdraw(w_ammount)
-        update_gui()
-        with_conf.config(text=f"Successfully withdrew {w_ammount} from your account!")
-        p_with_con.show()
+    else:
+        if (cur_user.u_balance < w_ammount):
+            with_conf.config(text=f"Error: Insufficient funds")
+            p_with_con.show()
+        if (cur_user.u_balance > w_ammount):
+            # TODO I need to make methods that will edit the database instead of just the user object
+            # cur_user.u_balance = cur_user.u_balance-w_ammount
+            cur_user.user_withdraw(w_ammount)
+            update_gui()
+            with_conf.config(text=f"Successfully withdrew {w_ammount} from your account!")
+            p_with_con.show()
 
 def attempt_deposit(ammount):
     # Returns error/success message to be displayed on confrimation screen.
@@ -399,12 +400,12 @@ def attempt_deposit(ammount):
     except:
         dep_conf.config(text=f"Error: Ammount to withdraw must be a float value (Must be a number)")
         p_dep_con.show()
-    
-    # cur_user.u_balance = cur_user.u_balance-w_ammount
-    cur_user.user_deposit(d_ammount)
-    update_gui()
-    dep_conf.config(text=f"Successfully deposited {d_ammount} into your account!")
-    p_dep_con.show()
+    else: 
+        # cur_user.u_balance = cur_user.u_balance-w_ammount
+        cur_user.user_deposit(d_ammount)
+        update_gui()
+        dep_conf.config(text=f"Successfully deposited {d_ammount} into your account!")
+        p_dep_con.show()
     
 
 # ~~~~~~~~~~~~~~~~~~~~
