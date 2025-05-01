@@ -30,15 +30,22 @@ class user():
         self.u_balance = u_tuple[4]
         self.u_email = u_tuple[5]
     
+    # updates self's 
     def reset(self):
         u_tuple = get_u_tuple(self.u_id)
         self.new_assign(u_tuple)
+
+    # returns self's user id
     def get_id(self):
         return self.u_id
     
     # withdraws money from an account.
     def user_withdraw(self, amm):
-        withdraw_from_account(self.u_tuple, amm)
+        withdraw_from_account(self.u_id, amm)
+        self.reset()
+    
+    def user_deposit(self, amm):
+        deposit_into_account(self.u_id, amm)
         self.reset()
     
     def __str__(self):
@@ -89,13 +96,14 @@ def withdraw_from_account(u_id, ammount_to_withdraw):
     mycursor.execute(cmd, vals)
     mydb.commit()
 
-    # update the user object with the change in the database
-    # user_id = the_user.get_id()
-    # cmd = "Select balance FROM accounts WHERE id = %s"
-    # vals = (user_id)
-    # mycursor.execute(cmd, vals)
-    # for x in mycursor:
-    #     print(f"Looking for balance...: {x}")
+def deposit_into_account(u_id, ammount_to_deposit):
+    #first I need to find the current balance
+    start_balance = get_u_tuple(u_id)[4] # index 4 is the balance
+    deposit_ammount = start_balance + ammount_to_deposit
+    cmd = "UPDATE accounts SET balance = %s WHERE id = %s"
+    vals = (deposit_ammount, u_id)
+    mycursor.execute(cmd, vals)
+    mydb.commit()
     
 def get_u_tuple(u_id):
     mycursor.execute(f"SELECT * FROM accounts WHERE id = {u_id}")
@@ -105,10 +113,10 @@ def get_u_tuple(u_id):
     for x in mycursor:
         accs_found = accs_found + 1
         # print("Found User: ")
-        # print(x) # x is a touple that represents the user (prints whole touple)
+        # print(x) # x is a tuple that represents the user (prints whole tuple)
 
-        # the 3rd element of the touple x is the first name
-        # the 2nd element of the touple x is the last name
+        # the 3rd element of the tuple x is the first name
+        # the 2nd element of the tuple x is the last name
         u_tuple = x
 
     # print(str(accs_found) + " account(s) found.")
@@ -134,10 +142,10 @@ def select_user(u_lname, u_pass):
     for x in mycursor:
         accs_found = accs_found + 1
         # print("Found User: ")
-        # print(x) # x is a touple that represents the user (prints whole touple)
+        # print(x) # x is a tuple that represents the user (prints whole tuple)
 
-        # the 3rd element of the touple x is the first name
-        # the 2nd element of the touple x is the last name
+        # the 3rd element of the tuple x is the first name
+        # the 2nd element of the tuple x is the last name
         print("User's Name = " + x[2] + " " + x[1])
         u_tuple = x
 
@@ -338,6 +346,8 @@ def attempt_withdraw(ammount):
     if (cur_user.u_balance > w_ammount):
         # TODO I need to make methods that will edit the database instead of just the user object
         # cur_user.u_balance = cur_user.u_balance-w_ammount
+        cur_user.user_withdraw(w_ammount)
+        update_gui()
         with_conf.config(text=f"Successfully withdrew {w_ammount} from your account! (Nothing actually withdrew yet.)")
         p_with_con.show()
     
@@ -424,15 +434,15 @@ class TestUserClass(unittest.TestCase):
 #~~~~~
 
 # testing the new user class~~~
-mycursor.execute("Select * from accounts where namelast = 'Mendez-Tigre'")
-aldair = None
-for x in mycursor:
-    print(x)
-    aldair = user(x)
-print("testt")
-# user()
-print(f"This is a user account's last name: {aldair.u_lastname}")
-print(f"This is a user account's last name: {aldair.u_tuple}")
+# mycursor.execute("Select * from accounts where namelast = 'Mendez-Tigre'")
+# aldair = None
+# for x in mycursor:
+#     print(x)
+#     aldair = user(x)
+# print("testt")
+# # user()
+# print(f"This is a user account's last name: {aldair.u_lastname}")
+# print(f"This is a user account's last name: {aldair.u_tuple}")
 
 # testing the user.reset() command. Should update info in user.u_tuple.
 # cmd = "UPDATE accounts SET balance = %s WHERE id = %s"
@@ -443,8 +453,14 @@ print(f"This is a user account's last name: {aldair.u_tuple}")
 # print("resets")
 
 # aldair.reset()
+
+# testing the user.user_deposit command
+# aldair.user_deposit(15)
+
 # print(f"This is a user account's last name: {aldair.u_lastname}")
 # print(f"This is a user account's last name: {aldair.u_tuple}")
+
+
 
 # ~~~~~
 
@@ -470,14 +486,14 @@ print(f"This is a user account's last name: {aldair.u_tuple}")
 
 # MAIN LOOP~~~~~
 
-# if __name__ == "__main__":
-#     cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
+if __name__ == "__main__":
+    cur_user = user((-1, "not_set", "not_set", "not_set", -1, "not_set"))
 
-#     root = tk.Tk()
-#     root.title("Sam's Bank of Elite 102 (trademarked)")
-#     main = MainView(root)
-#     main.pack(side="top", fill="both", expand=True)
-#     root.wm_geometry("400x400")
+    root = tk.Tk()
+    root.title("Sam's Bank of Elite 102 (trademarked)")
+    main = MainView(root)
+    main.pack(side="top", fill="both", expand=True)
+    root.wm_geometry("400x400")
 
-#     root.mainloop()
+    root.mainloop()
 #     # Anything past this point only happens after the program is terminated. Good to know.
