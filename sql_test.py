@@ -27,6 +27,9 @@ class user():
         self.u_balance = u_tuple[4]
         self.u_email = u_tuple[5]
     
+    def get_id(self):
+        return self.u_id
+    
     def __str__(self):
         return f"User: lastname: {self.u_lastname}, acc id: {self.u_id}"
 
@@ -62,6 +65,23 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 # functions for utility ?
+
+# the_user is a user object
+# ammount_to_withdraw is a float/double value
+def withdraw_from_account(the_user, ammount_to_withdraw):
+    user_id = the_user.get_id()
+    cmd = "UPDATE accounts SET balance = %s WHERE id = %s"
+    vals = (ammount_to_withdraw, user_id)
+    mycursor.execute("UPDATE accounts SET balance = 4 WHERE id = 1")
+
+    # update the user object with the change in the database
+    # user_id = the_user.get_id()
+    # cmd = "Select balance FROM accounts WHERE id = %s"
+    # vals = (user_id)
+    # mycursor.execute(cmd, vals)
+    # for x in mycursor:
+    #     print(f"Looking for balance...: {x}")
+    
 
 
 # TODO call whenever submit button is pressed
@@ -99,6 +119,8 @@ def select_user(u_lname, u_pass):
 
         return cur_user
     elif (accs_found == 0):
+        global loginErrorLabel
+        loginErrorLabel.config(text="Incorrect name or password. Please try again.")
         return None
     return None
 
@@ -138,7 +160,8 @@ class Login(Page):
         # building login screen
         welcomeLabel = tk.Label(self, text="Welcome to my project!", padx=20)
         loginDirectionsLabel = tk.Label(self, pady=10, text="Please enter your last name and account password.")
-        
+        global loginErrorLabel
+        loginErrorLabel = tk.Label(self, pady=10, text="")
         global u_lname
         u_lname = tk.Entry(self)
         global u_pass
@@ -151,6 +174,7 @@ class Login(Page):
         u_lname.pack()
         u_pass.pack()
         submitButton.pack()
+        loginErrorLabel.pack()
         login_label.pack(side="top", fill="both", expand=True)
 
         
@@ -242,6 +266,7 @@ def update_gui():
 
     global with_conf
     with_conf.config(text=f"Hm. Something went wrong.")
+
 
 def attempt_logout(confrimed):
     if (confrimed == False):
@@ -361,15 +386,21 @@ class TestUserClass(unittest.TestCase):
 #~~~~~
 
 # testing the new user class~~~
-# mycursor.execute("Select * from accounts where namelast = 'Mendez-Tigre'")
-# aldair = None
-# for x in mycursor:
-#     print(x)
-#     aldair = user(x)
-# print("testt")
-# # user()
-# print(f"This is a user account's last name: {aldair.u_lastname}")
+mycursor.execute("Select * from accounts where namelast = 'Mendez-Tigre'")
+aldair = None
+for x in mycursor:
+    print(x)
+    aldair = user(x)
+print("testt")
+# user()
+print(f"This is a user account's last name: {aldair.u_lastname}")
 # ~~~~~
+
+
+#~~``
+
+print(aldair.u_balance)
+withdraw_from_account(aldair, 12)
 
 
 # MAIN LOOP~~~~~
