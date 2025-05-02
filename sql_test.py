@@ -224,9 +224,13 @@ class Login(Page):
         global u_lname
         u_lname = tk.Entry(self)
         global u_pass
-        u_pass = tk.Entry(self)
+        u_pass = tk.Entry(self, show="*")
 
         submitButton = tk.Button(self, text="Login", command = lambda: attempt_login(u_lname.get(), u_pass.get()))
+
+        new_user_directions = tk.Label(self, pady=1, text="New user?")
+        new_acc_Button = tk.Button(self, text="Create Account", command = lambda: p_create_acc.show())
+        
 
         welcomeLabel.pack()
         loginDirectionsLabel.pack()
@@ -234,11 +238,60 @@ class Login(Page):
         u_pass.pack()
         submitButton.pack()
         loginErrorLabel.pack()
-        login_label.pack(side="top", fill="both", expand=True)
+        
+        new_user_directions.pack()
+        new_acc_Button.pack()
 
+        login_label.pack(side="top", fill="both", expand=True)
         
         u_lname.insert(0, "Last Name")
         u_pass.insert(0, "Password")
+
+class Create_acc(Page):
+   def __init__(self, *args, **kwargs):
+        Page.__init__(self, *args, **kwargs)
+        login_label = tk.Label(self, text="This is the account creation screen")
+
+
+        # building account creation screen
+        createLabel = tk.Label(self, text="Welcome!", padx=20)
+        createDirectionsLabel = tk.Label(self, pady=10, text="Let's get you set up.")
+        
+        global create_fname
+        create_fname = tk.Entry(self)
+        global create_lname
+        create_lname = tk.Entry(self)
+        global create_email
+        create_email = tk.Entry(self)
+        global create_pass
+        create_pass = tk.Entry(self, show="*")
+
+
+        # submitButton = tk.Button(self, text="Login", command = lambda: attempt_login(u_lname.get(), u_pass.get()))
+        create_account = tk.Button(self, text="Create Account", command = lambda: print(f"Created new account! f_name: {create_fname.get()}, lname: {create_lname.get()}, email: {create_email.get()}, pass: {create_pass.get()}."))
+        button_logout = tk.Button(self, text="Logout", command = lambda: attempt_logout(True))
+
+        
+
+        # packing acc creation
+        createLabel.pack()
+        createDirectionsLabel.pack()
+
+        create_fname.pack()
+        create_lname.pack()
+        create_email.pack()
+        create_pass.pack()
+
+        create_account.pack()
+        button_logout.pack()
+
+
+        # config acc creation
+        create_fname.insert(0, "First Name")
+        create_lname.insert(0, "Last Name")
+        create_email.insert(0, "Email")
+        create_pass.insert(0, "Pass")
+
 
 class u_dashboard(Page):
    def __init__(self, *args, **kwargs):
@@ -361,6 +414,27 @@ def update_gui():
     txt = u_dep_amm.get()
     u_dep_amm.delete(0, len(txt))
 
+    # Account creation page
+    global create_fname
+    txt = create_fname.get()
+    create_fname.delete(0, len(txt))
+    create_fname.insert(0, "First Name")
+
+    global create_lname
+    txt = create_lname.get()
+    create_lname.delete(0, len(txt))
+    create_lname.insert(0, "Last Name")
+
+    global create_email
+    txt = create_email.get()
+    create_email.delete(0, len(txt))
+    create_email.insert(0, "Email")
+
+    global create_pass
+    txt = create_pass.get()
+    create_pass.delete(0, len(txt))
+    create_pass.insert(0, "Pass")
+
 
 def attempt_logout(confrimed):
     if (confrimed == False):
@@ -458,6 +532,9 @@ class MainView(tk.Frame):
         global p_dep_con
         p_dep_con = deposit_confrim(self)
 
+        global p_create_acc
+        p_create_acc = Create_acc(self)
+
         print("Set GPages")
 
         buttonframe = tk.Frame(self)
@@ -472,6 +549,7 @@ class MainView(tk.Frame):
         p_dep.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_with_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_dep_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_create_acc.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         p_login.show() # shows p1 by deafult
         # p2.show()
