@@ -481,6 +481,18 @@ class deposit_confrim(Page):
        button_to_dash.pack()
        dep_conf.pack(side="top", fill="both", expand=True)
 
+class update_acc_confrim(Page):
+   def __init__(self, *args, **kwargs):
+       Page.__init__(self, *args, **kwargs)
+       global acc_up_conf
+       acc_up_conf = tk.Label(self, text="This is the account update confrimation screen.")
+       up_status_label = tk.Label(self, text="Account Update confrimation")
+       button_to_dash = tk.Button(self, text="Back to Dashboard", command = lambda: p_dash.show())
+
+       up_status_label.pack()
+       button_to_dash.pack()
+       acc_up_conf.pack(side="top", fill="both", expand=True)
+
 def update_gui():
     global wel
     wel.config(text = f"Welcome back, {cur_user.u_firstname}!!")
@@ -546,6 +558,10 @@ def update_gui():
     edit_pass.delete(0, len(txt))
     edit_pass.insert(0, cur_user.get_pass())
 
+    # Account Update Confirmation Page
+    global acc_up_conf
+    acc_up_conf.config(text=f"Update Successful! \n First Name: {edit_fname.get()} \n Last Name: {edit_lname.get()} \n Email: {edit_email.get()} \n Password: {edit_pass.get()}")
+
 
 def attempt_logout(confrimed):
     if (confrimed == False):
@@ -596,7 +612,7 @@ def attempt_acc_update():
     # Should be it's own function that way validation and GUI stuff happens seperately but it's fine for now.
     cur_user.user_update(c_tuple)
     update_gui()
-    p_dash.show()
+    p_up_conf.show()
 
 def attempt_login(nm, pword):
     # print("yay.")
@@ -694,6 +710,9 @@ class MainView(tk.Frame):
         global p_update_acc
         p_update_acc = Edit_acc(self)
 
+        global p_up_conf
+        p_up_conf = update_acc_confrim(self)
+
         print("Set GPages")
 
         buttonframe = tk.Frame(self)
@@ -710,6 +729,7 @@ class MainView(tk.Frame):
         p_dep_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_create_acc.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_update_acc.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_up_conf.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         p_login.show() # shows p1 by deafult
         # p2.show()
