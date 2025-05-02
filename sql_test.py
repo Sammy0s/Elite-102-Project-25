@@ -170,6 +170,19 @@ def select_user(u_lname, u_pass):
         return None
     return None
 
+def add_account(c_tuple):
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+    u_lastname = c_tuple[0]
+    u_firstname = c_tuple[1]
+    u_password = c_tuple[2]
+    u_email = c_tuple[3]
+
+
+    # Inserts the user info into a new row in the database
+    mycursor.execute(f"INSERT INTO accounts (namelast, namefirst, password, balance, email) VALUES ('{u_lastname}', '{u_firstname}', '{u_password}', 0, '{u_email}')")
+    mydb.commit()
+
 
 
 # Globals ??
@@ -555,6 +568,18 @@ class TestUserClass(unittest.TestCase):
 # print("Trying to print u_tuple for user id 6: " + str(get_u_tuple(6)[2]))
 #~~``
 
+# my_user = ("Gammer", "Sally", "MC_FRRR:D", "dont_talk_to_me@joyful.org")
+# add_account(my_user)
+
+
+# mycursor.execute("INSERT INTO accounts (namelast, namefirst, password, balance, email) VALUES ('Berry', 'Straw', 'a_fruit', 0, 'pick_me_girl@yahoo.com')")
+# mydb.commit()
+
+
+# c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+
+#~~~~~~~~
 
 
 
