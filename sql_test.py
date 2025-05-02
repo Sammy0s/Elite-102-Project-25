@@ -30,6 +30,14 @@ class user():
         self.u_balance = u_tuple[4]
         self.u_email = u_tuple[5]
     
+    def user_update(self, c_tuple):
+        # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+        self.u_lastname = c_tuple[0]
+        self.u_firstname = c_tuple[1]
+        self.u_password = c_tuple[2]
+        self.u_email = c_tuple[3]
+    
     # updates self's 
     def reset(self):
         u_tuple = get_u_tuple(self.u_id)
@@ -38,6 +46,24 @@ class user():
     # returns self's user id
     def get_id(self):
         return self.u_id
+
+    def get_lname(self):
+        return self.u_lastname
+    
+    def get_fname(self):
+        return self.u_firstname
+    
+    def get_pass(self):
+        return self.u_password
+    
+    def get_bal(self):
+        return self.u_balance
+    
+    def get_email(self):
+        return self.u_email
+    
+    def get_u_tuple(self):
+        return self.u_tuple
     
     # withdraws money from an account.
     def user_withdraw(self, amm):
@@ -184,6 +210,23 @@ def add_account(c_tuple, do_commit):
     if (do_commit):
         mydb.commit()
 
+def update_account(c_tuple, do_commit):
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+
+    u_lastname = c_tuple[0]
+    u_firstname = c_tuple[1]
+    u_password = c_tuple[2]
+    u_email = c_tuple[3]
+
+    user_id = cur_user.get_id()
+
+
+    # Inserts the user info into a new row in the database
+    # f"UPDATE accounts SET namelast='{u_lastname}', namefirst='u_firstname', password='u_password', email='{u_email}'"
+    mycursor.execute(f"UPDATE accounts SET namelast='{u_lastname}', namefirst='{u_firstname}', password='{u_password}', email='{u_email}' WHERE id = {user_id}")
+    if (do_commit):
+        mydb.commit()
 
 
 # Globals ??
@@ -292,6 +335,50 @@ class Create_acc(Page):
         create_email.insert(0, "Email")
         create_pass.insert(0, "Pass")
 
+class Edit_acc(Page):
+   def __init__(self, *args, **kwargs):
+        Page.__init__(self, *args, **kwargs)
+        edit_label = tk.Label(self, text="This is the account update/edit screen")
+
+
+        # building account creation screen
+        editLabel = tk.Label(self, text="Welcome!", padx=20)
+        editDirectionsLabel = tk.Label(self, pady=10, text="Update any details you want to change.")
+        
+        global edit_fname
+        edit_fname = tk.Entry(self)
+        global edit_lname
+        edit_lname = tk.Entry(self)
+        global edit_email
+        edit_email = tk.Entry(self)
+        global edit_pass
+        edit_pass = tk.Entry(self, show="*")
+
+
+        # submitButton = tk.Button(self, text="Login", command = lambda: attempt_login(u_lname.get(), u_pass.get()))
+        edit_account = tk.Button(self, text="Update Details", command = lambda: attempt_acc_update())
+        button_to_dash = tk.Button(self, text="Back to Dashboard", command = lambda: p_dash.show())
+
+
+        # packing acc update
+        editLabel.pack()
+        editDirectionsLabel.pack()
+
+        edit_fname.pack()
+        edit_lname.pack()
+        edit_email.pack()
+        edit_pass.pack()
+
+        edit_account.pack()
+        button_to_dash.pack()
+
+
+        # config acc update
+        edit_fname.insert(0, "First Name")
+        edit_lname.insert(0, "Last Name")
+        edit_email.insert(0, "Email")
+        edit_pass.insert(0, "Pass")
+
 
 class u_dashboard(Page):
    def __init__(self, *args, **kwargs):
@@ -307,6 +394,8 @@ class u_dashboard(Page):
        global p_with
        button_withdrawl = tk.Button(self, text="Withdrawl Money", command = lambda: p_with.show())
 
+       button_edit_acc = tk.Button(self, text="Update Account Details", command = lambda: p_update_acc.show())
+
        button_logout = tk.Button(self, text="Logout to sign in screen", command = lambda: attempt_logout(False))
 
 
@@ -315,6 +404,7 @@ class u_dashboard(Page):
 
        button_deposit.pack()
        button_withdrawl.pack()
+       button_edit_acc.pack()
 
        button_logout.pack()
 
@@ -435,6 +525,27 @@ def update_gui():
     create_pass.delete(0, len(txt))
     create_pass.insert(0, "Pass")
 
+    # Account Update Page
+    global edit_fname
+    txt = edit_fname.get()
+    edit_fname.delete(0, len(txt))
+    edit_fname.insert(0, cur_user.get_fname())
+
+    global edit_lname
+    txt = edit_lname.get()
+    edit_lname.delete(0, len(txt))
+    edit_lname.insert(0, cur_user.get_lname())
+
+    global edit_email
+    txt = edit_email.get()
+    edit_email.delete(0, len(txt))
+    edit_email.insert(0, cur_user.get_email())
+
+    global edit_pass
+    txt = edit_pass.get()
+    edit_pass.delete(0, len(txt))
+    edit_pass.insert(0, cur_user.get_pass())
+
 
 def attempt_logout(confrimed):
     if (confrimed == False):
@@ -464,6 +575,29 @@ def attempt_acc_creation():
     # Should be it's own function that way validation and GUI stuff happens seperately but it's fine for now.
     p_login.show()
 
+def attempt_acc_update():
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+    global edit_lname, edit_fname, edit_pass, edit_email
+    c_tuple = (edit_lname.get(), edit_fname.get(), edit_pass.get(), edit_email.get())
+
+
+    # This is where any validation needs to happen for account creation.
+    u_lastname = c_tuple[0]
+    u_firstname = c_tuple[1]
+    u_password = c_tuple[2]
+    u_email = c_tuple[3]
+
+    # calling sql function to actually update the account
+    update_account(c_tuple, True)
+
+    # Move the user back to the dashboard after creating the account
+    # Should be it's own function that way validation and GUI stuff happens seperately but it's fine for now.
+    cur_user.user_update(c_tuple)
+    update_gui()
+    p_dash.show()
+
 def attempt_login(nm, pword):
     # print("yay.")
     # print(f"Last name: {nm}, Password: {pword}")
@@ -487,6 +621,7 @@ def attempt_withdraw(ammount):
     else:
         if (cur_user.u_balance < w_ammount):
             with_conf.config(text=f"Error: Insufficient funds")
+            update_gui()
             p_with_con.show()
         elif(w_ammount <=0.0):
             with_conf.config(text=f"Error: Ammount to withdraw must be greater than 0")
@@ -556,6 +691,9 @@ class MainView(tk.Frame):
         global p_create_acc
         p_create_acc = Create_acc(self)
 
+        global p_update_acc
+        p_update_acc = Edit_acc(self)
+
         print("Set GPages")
 
         buttonframe = tk.Frame(self)
@@ -571,6 +709,7 @@ class MainView(tk.Frame):
         p_with_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_dep_con.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
         p_create_acc.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        p_update_acc.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         p_login.show() # shows p1 by deafult
         # p2.show()
