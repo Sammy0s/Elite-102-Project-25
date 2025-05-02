@@ -170,7 +170,7 @@ def select_user(u_lname, u_pass):
         return None
     return None
 
-def add_account(c_tuple):
+def add_account(c_tuple, do_commit):
     # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
 
     u_lastname = c_tuple[0]
@@ -181,7 +181,8 @@ def add_account(c_tuple):
 
     # Inserts the user info into a new row in the database
     mycursor.execute(f"INSERT INTO accounts (namelast, namefirst, password, balance, email) VALUES ('{u_lastname}', '{u_firstname}', '{u_password}', 0, '{u_email}')")
-    mydb.commit()
+    if (do_commit):
+        mydb.commit()
 
 
 
@@ -268,10 +269,9 @@ class Create_acc(Page):
 
 
         # submitButton = tk.Button(self, text="Login", command = lambda: attempt_login(u_lname.get(), u_pass.get()))
-        create_account = tk.Button(self, text="Create Account", command = lambda: print(f"Created new account! f_name: {create_fname.get()}, lname: {create_lname.get()}, email: {create_email.get()}, pass: {create_pass.get()}."))
+        create_account = tk.Button(self, text="Create Account", command = lambda: attempt_acc_creation())
         button_logout = tk.Button(self, text="Logout", command = lambda: attempt_logout(True))
 
-        
 
         # packing acc creation
         createLabel.pack()
@@ -442,6 +442,27 @@ def attempt_logout(confrimed):
     else:
         update_gui()
         p_login.show()
+
+def attempt_acc_creation():
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+
+    # c_tuple is a user creation tuple that has namelast, namefirst, password, and email of the user (in that order.)
+    global create_lname, create_fname, create_pass, create_email
+    c_tuple = (create_lname.get(), create_fname.get(), create_pass.get(), create_email.get())
+
+
+    # This is where any validation needs to happen for account creation.
+    u_lastname = c_tuple[0]
+    u_firstname = c_tuple[1]
+    u_password = c_tuple[2]
+    u_email = c_tuple[3]
+
+    # calling sql function to actually create the account
+    add_account(c_tuple, True)
+
+    # Move the user back to the dashboard after creating the account
+    # Should be it's own function that way validation and GUI stuff happens seperately but it's fine for now.
+    p_login.show()
 
 def attempt_login(nm, pword):
     # print("yay.")
@@ -647,7 +668,7 @@ class TestUserClass(unittest.TestCase):
 #~~``
 
 # my_user = ("Gammer", "Sally", "MC_FRRR:D", "dont_talk_to_me@joyful.org")
-# add_account(my_user)
+# add_account(my_user, False)
 
 
 # mycursor.execute("INSERT INTO accounts (namelast, namefirst, password, balance, email) VALUES ('Berry', 'Straw', 'a_fruit', 0, 'pick_me_girl@yahoo.com')")
