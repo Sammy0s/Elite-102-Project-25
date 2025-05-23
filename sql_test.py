@@ -584,6 +584,23 @@ def attempt_acc_creation():
     u_password = c_tuple[2]
     u_email = c_tuple[3]
 
+    update_gui()
+    # User can't create an account that uses default values.
+    if (u_firstname == "First Name"):
+        return False
+    elif (u_lastname == "Last Name"):
+        return False
+    elif (u_password == "Pass"):
+        return False
+    elif (u_email == "Email"):
+        return False
+    
+    # User password must be at least 6 characters
+    if (len(u_password) < 6):
+        return "Error- Password must be at least 6 characters"
+
+    
+
     # calling sql function to actually create the account
     add_account(c_tuple, True)
 
